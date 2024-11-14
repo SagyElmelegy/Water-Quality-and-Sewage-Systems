@@ -1,20 +1,24 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 #Load dataset
 df = pd.read_csv('water quality and sewage system.csv')
 df.head()
 
-#Cleaning the data
-
-#Dropping rows with missing values
-df.dropna(inplace=True)
+#Preparing and cleaning the data
 
 #Converting relevant columns to appropriate data types if needed
 df['Sampling Date'] = pd.to_datetime(df['Sampling Date'])
 df['Sampling Date'] = df['Sampling Date'].dt.year
 
-#Checking for duplicates and removing them
-df.drop_duplicates(inplace=True)
+#Dropping rows with missing values
+df.dropna(inplace=True)
+
+#Checking if there are any duplicates in the dataset
+df.duplicated().sum()
+
+#Removing all the duplicates
+df= df.drop_duplicates()
 
 #Displaying a sample of the cleaned dataset
 df.head()
@@ -58,15 +62,23 @@ print("Average Phosphorus Level in 'Good' Sewage System Condition by Year:")
 print(good_sewage_by_year)
 
 #Sorting Data Question
+# 7.Which 10 locations in the USA have the highest nitrogen concentration levels?
 top_10_locations_nitrogen = df[['Location', 'Nitrogen (mg/L)']].sort_values(by='Nitrogen (mg/L)', ascending=False).head(10)
 print("Top 10 Locations with Highest Nitrogen Concentration Levels:")
 print(top_10_locations_nitrogen)
 
 #Combination Question
+# 8.What is the average phosphorus concentration for samples taken in the top 5 regions with the highest average nitrogen levels?
 top_5_regions_nitrogen = df.groupby('Location')['Nitrogen (mg/L)'].mean().sort_values(ascending=False).head(5).index
 top_5_samples = df[df['Location'].isin(top_5_regions_nitrogen)]
 average_phosphorus_top_5 = top_5_samples['Phosphorus (mg/L)'].mean()
 print("Average Phosphorus Concentration in Top 5 Regions with Highest Average Nitrogen Levels:", average_phosphorus_top_5)
+
+# 9.What is the average nitrogen concentration for samples collected in regions with "Good" sewage systems and phosphorus levels above the overall average phosphorus level
+average_phosphorus = df['Phosphorus (mg/L)'].mean()
+filtered_data = df[(df['State of Sewage System'] == 'Good') & (df['Phosphorus (mg/L)'] > average_phosphorus)]
+average_nitrogen_good_high_phosphorus = filtered_data['Nitrogen (mg/L)'].mean()
+print("Average Nitrogen Concentration in 'Good' Sewage System Regions with Above-Average Phosphorus:", average_nitrogen_good_high_phosphorus)
 
 #Visualizations
 
@@ -92,4 +104,12 @@ plt.title('Trends in Nitrogen and Phosphorus Levels Across the Years')
 plt.xlabel('Year')
 plt.ylabel('Concentration (mg/L)')
 plt.legend()
+plt.show()
+
+# 3. What percentage of samples fall under each sewage system condition category (e.g., "Good," "Moderate," etc.)?
+sewage_condition_counts = df['State of Sewage System'].value_counts()
+# Plot the pie chart
+plt.figure(figsize=(8, 8))
+plt.pie(sewage_condition_counts, labels=sewage_condition_counts.index, autopct='%1.1f%%', startangle=90, colors=['skyblue', 'lightgreen', 'salmon'])
+plt.title('Distribution of Sewage System Conditions')
 plt.show()
