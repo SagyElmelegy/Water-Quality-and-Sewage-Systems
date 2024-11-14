@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 #Load dataset
-df = pd.read_csv('water quality and sewage system.csv')
+df = pd.read_csv('Water Quality and Sewage Systems.csv')
 df.head()
 
 #Preparing and cleaning the data
